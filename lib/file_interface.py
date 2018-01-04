@@ -38,8 +38,16 @@ class Table_file:
 
 
 
-    def get_table(self, index=0):
-        return self.tables[index % len(self.tables)]
+    def get_table(self, seed=-1):
+        # Return random table
+        if(seed == -1 or not self.is_number(seed)):
+            if(not self.is_number(seed)):
+                print("Seed is not a number!")
+            rnd = random.randint(0, len(self.tables))
+            return self.get_table(rnd)
+        # Return table by seed
+        else:
+            return self.tables[int(seed) % len(self.tables)]
 
 
 
@@ -48,3 +56,19 @@ class Table_file:
         rnd = random.randint(0, len(self.tables))
         return self.get_table(rnd)
 
+
+    def is_number(self, s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            pass
+
+        try:
+            import unicodedata
+            unicodedata.numeric(s)
+            return True
+        except (TypeError, ValueError):
+            pass
+
+        return False

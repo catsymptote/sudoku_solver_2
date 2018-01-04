@@ -46,7 +46,7 @@ class Window:
         self.menu.append(tk.Button(root_window, text="New board", font="Arial 12", command=self.new_board))
         self.menu[1].place(x=9 * self.size, y=1 * self.size, width=2 * self.size, height=self.size)
 
-        self.menu.append(tk.Button(root_window, text="New board\nfrom seed:", font="Arial 12"))
+        self.menu.append(tk.Button(root_window, text="New board\nfrom seed:", font="Arial 12", command=lambda: self.new_board([], self.menu[3].get())))
         self.menu[2].place(x=9 * self.size, y=2 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Entry(root_window, justify="center", font="Arial 24"))
@@ -113,9 +113,18 @@ class Window:
                 self.update_cell(x, y, cell_input)
 
 
-    def new_board(self, matrix=[]):
+
+    def new_board(self, matrix=[], seed=-1):
         if(not matrix):
-            matrix = self.tabFile.get_random_table()
+            # No seed
+            if(seed == -1):
+                matrix = self.tabFile.get_table()
+            elif(not self.is_number(seed)):
+                print("Seed is not a number.")
+                matrix = self.tabFile.get_table()
+            else:
+                matrix = self.tabFile.get_table(seed)
+
         self.clear_board()
         for x in range(9):
             for y in range(9):
