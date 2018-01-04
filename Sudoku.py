@@ -3,6 +3,7 @@ from lib import printer
 from lib import window
 
 
+
 import tkinter as tk
 
 
@@ -25,7 +26,7 @@ win.new_board(tabFile.get_random_table())
 
 def update():
     win.update()
-    root_window.after(1000, update)
+    root_window.after(100, update)
 
-root_window.after(1000, update)
+root_window.after(100, update)
 root_window.mainloop()

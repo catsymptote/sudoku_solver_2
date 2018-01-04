@@ -17,7 +17,9 @@ class Table_file:
 
         #print(len(lines))
 
-        table_count = len(lines) / 10
+        line_count = len(lines)
+        table_count = line_count / 10
+
 
         tables = [[[]]]
         k = 0
@@ -26,7 +28,13 @@ class Table_file:
             for i in range(9):
                 row = []
                 for j in range(9):
-                    row.append(lines[k*10 + i+1][j])
+                    row.append(lines[k * 10 + i + 1][j])
+                    """
+                    if(not k*10 + i+1 > line_count):
+                        row.append(lines[k*10 + i+1][j])
+                    else:
+                        print("List index out of range: " + str(k*10 + i+1) + " > " + str(line_count))
+                    """
                     #print(str(k) + " - " + str(i) + " - " + str(j))
                 #print(row)
                 table.append(row)

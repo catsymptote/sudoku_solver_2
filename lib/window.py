@@ -1,4 +1,5 @@
 from lib import file_interface as fInter
+from lib import sudoku_engine as engine
 
 
 import tkinter as tk
@@ -7,12 +8,15 @@ import time
 
 
 class Window:
+    board = [[]]
     entry_matrix = [[]]
+    entry_IntVars = [[]]
     menu = []
     size = 64
     start = 0
 
     timeVar = ""
+
 
 
 
@@ -24,6 +28,7 @@ class Window:
 
 
     tabFile = fInter.Table_file()
+    suEng = engine.Sudoku_engine()
 
 
     def __init__(self, root_window):
@@ -37,8 +42,9 @@ class Window:
         root_window.geometry(geo)
         root_window.title("Sudoku Solver")
 
+
+
         self.timeVar = tk.StringVar()
-        #self.timeVar.set("00:00")
 
         self.menu.append(tk.Label(root_window, textvariable=self.timeVar, font="Arial 24"))
         self.menu[0].place(x=9 * self.size, y=0 * self.size, width=2 * self.size, height=self.size)
@@ -52,7 +58,7 @@ class Window:
         self.menu.append(tk.Entry(root_window, justify="center", font="Arial 24"))
         self.menu[3].place(x=9 * self.size, y=3 * self.size, width=2 * self.size, height=self.size)
 
-        self.menu.append(tk.Button(root_window, text="Check", font="Arial 12"))
+        self.menu.append(tk.Button(root_window, text="Check", font="Arial 12", command=lambda: self.suEng.check(self.board)))
         self.menu[4].place(x=9 * self.size, y=4 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Solve", font="Arial 12"))
@@ -70,25 +76,30 @@ class Window:
 
 
 
-        #table_frame = tk.Frame(root_window)
-        #table_frame.geometry("500x500+0+0")
-        #table_frame.place(x=300, y=400)
-
         table = []
+        entry_vars = []
         for i in range(9):
             row = []
+            entry_row = []
             for j in range(9):
                 row.append(tk.Entry(root_window, justify="center", font="Arial 32 bold"))
                 row[j].place(x=i*self.size, y=j*self.size, width=self.size, height=self.size)
                 #row[j].grid(row=5*i, column=j, rowspan=5, columnspan=1)
+
+                entry_row.append(tk.StringVar())
+                entry_row[j].trace("w", self.test())
             table.append(row)
+            entry_vars.append(entry_row)
         self.entry_matrix = table
+        self.entry_IntVars = entry_vars
+        self.board = self.get_board()
 
 
 
     def update_cell(self, x, y, ins):
         self.entry_matrix[x][y].delete(0)
         self.entry_matrix[x][y].insert(0, str(ins))
+
 
 
     def get_cell(self, x, y):
@@ -126,6 +137,7 @@ class Window:
                 matrix = self.tabFile.get_table(seed)
 
         self.clear_board()
+
         for x in range(9):
             for y in range(9):
                 if(self.is_number(matrix[x][y])):
@@ -133,6 +145,7 @@ class Window:
                     if(not num == 0):
                         self.update_cell(x, y, num)
                         self.entry_matrix[x][y].config(fg=self.static_color)
+
         self.reset_time()
         self.update()
 
@@ -140,6 +153,7 @@ class Window:
 
     def set_fg_color(self, x, y, color):
         self.entry_matrix[x][y].config(fg=self.color)
+
 
 
     def is_number(self, s):
@@ -159,23 +173,46 @@ class Window:
         return False
 
 
+
     def reset_time(self):
         self.start = time.time()
         pass
 
 
-    def update(self):
+
+    def set_time(self):
         now = int(time.time() - self.start)
 
         mm = "00"
         ss = "00"
-        mm = str(int(now/60))
-        ss = str(int(now%60))
+        mm = str(int(now / 60))
+        ss = str(int(now % 60))
 
-        if(int(mm) < 10):
+        if (int(mm) < 10):
             mm = "0" + mm
         if (int(ss) < 10):
             ss = "0" + ss
 
         formatted_now = mm + ":" + ss
         self.timeVar.set(formatted_now)
+
+
+
+    def board_update(self):
+        if(not self.board == self.get_board()):
+            self.suEng.check(self.board)
+            print("Changes found.")
+        self.board = self.get_board()
+
+
+
+
+    def test(self, *args):
+        #print("test")
+        pass
+
+
+
+    def update(self):
+        self.set_time()
+        self.board_update()
