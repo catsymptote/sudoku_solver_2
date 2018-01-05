@@ -12,6 +12,7 @@ class Window:
     entry_matrix = [[]]
     entry_IntVars = [[]]
     menu = []
+    indexing = []
     size = 64
     start = 0
 
@@ -26,14 +27,17 @@ class Window:
     error_color     = "#FF0000"
     good_color      = "#00FF00"
 
+    x_square_color          = "#EEE"
+    diamond_square_color    = "#FFF"
+
 
     tabFile = fInter.Table_file()
     suEng = engine.Sudoku_engine()
 
 
     def __init__(self, root_window):
-        w = (9 + 2) * self.size
-        h = (9) * self.size
+        w = (9 + 2 + 1) * self.size
+        h = (9 + 1) * self.size
         shiftX = 200
         shiftY = 200
         geo = str(w) + "x" + str(h) + "+" + str(shiftX) + "+" + str(shiftY)
@@ -42,52 +46,76 @@ class Window:
         root_window.geometry(geo)
         root_window.title("Sudoku Solver")
 
+        # Numbering/indexing lines
+        self.indexing.append(tk.Label(root_window, text="[y,x]", font="Arial 24"))
+        self.indexing[0].place(x=0 * self.size, y=0 * self.size, width=self.size, height=self.size)
+
+        for i in range(9):
+            self.indexing.append(tk.Label(root_window, text=str(i+1), font="Arial 24"))
+            self.indexing[i+1].place(x=(i+1) * self.size, y=0 * self.size, width=self.size, height=self.size)
+
+        for i in range(9):
+            self.indexing.append(tk.Label(root_window, text=str(i+1), font="Arial 24"))
+            self.indexing[i+1+9].place(x=0 * self.size, y=(i+1) * self.size, width=self.size, height=self.size)
 
 
+
+        # Menu line
         self.timeVar = tk.StringVar()
 
         self.menu.append(tk.Label(root_window, textvariable=self.timeVar, font="Arial 24"))
-        self.menu[0].place(x=9 * self.size, y=0 * self.size, width=2 * self.size, height=self.size)
+        self.menu[0].place(x=10 * self.size, y=0 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="New board", font="Arial 12", command=self.new_board))
-        self.menu[1].place(x=9 * self.size, y=1 * self.size, width=2 * self.size, height=self.size)
+        self.menu[1].place(x=10 * self.size, y=1 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="New board\nfrom seed:", font="Arial 12", command=lambda: self.new_board([], self.menu[3].get())))
-        self.menu[2].place(x=9 * self.size, y=2 * self.size, width=2 * self.size, height=self.size)
+        self.menu[2].place(x=10 * self.size, y=2 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Entry(root_window, justify="center", font="Arial 24"))
-        self.menu[3].place(x=9 * self.size, y=3 * self.size, width=2 * self.size, height=self.size)
+        self.menu[3].place(x=10 * self.size, y=3 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Check", font="Arial 12", command=lambda: self.suEng.check(self.board)))
-        self.menu[4].place(x=9 * self.size, y=4 * self.size, width=2 * self.size, height=self.size)
+        self.menu[4].place(x=10 * self.size, y=4 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Solve", font="Arial 12"))
-        self.menu[5].place(x=9 * self.size, y=5 * self.size, width=2 * self.size, height=self.size)
+        self.menu[5].place(x=10 * self.size, y=5 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Save", font="Arial 12"))
-        self.menu[6].place(x=9 * self.size, y=6 * self.size, width=2 * self.size, height=self.size)
+        self.menu[6].place(x=10 * self.size, y=7 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Load", font="Arial 12"))
-        self.menu[7].place(x=9 * self.size, y=7 * self.size, width=2 * self.size, height=self.size)
+        self.menu[7].place(x=10 * self.size, y=8 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Settings", font="Arial 12"))
-        self.menu[8].place(x=9 * self.size, y=8 * self.size, width=2 * self.size, height=self.size)
+        self.menu[8].place(x=10 * self.size, y=9 * self.size, width=2 * self.size, height=self.size)
 
 
 
 
         table = []
         entry_vars = []
-        for i in range(9):
+        for j in range(9):
             row = []
             entry_row = []
-            for j in range(9):
+            for i in range(9):
                 row.append(tk.Entry(root_window, justify="center", font="Arial 32 bold"))
-                row[j].place(x=i*self.size, y=j*self.size, width=self.size, height=self.size)
+                row[i].place(x=(i+1)*self.size, y=(j+1)*self.size, width=self.size, height=self.size)
                 #row[j].grid(row=5*i, column=j, rowspan=5, columnspan=1)
-
+                # Part of x squares
+                if(
+                        (i < 3 and i >= 0 and j < 3 and j >= 0) or
+                        (i < 6 and i >= 3 and j < 6 and j >= 3) or
+                        (i < 9 and i >= 6 and j < 9 and j >= 6) or
+                        (i < 3 and i >= 0 and j < 9 and j >= 6) or
+                        (i < 9 and i >= 6 and j < 3 and j >= 0)
+                ):
+                    row[i].configure(background=self.x_square_color)
+                # Part of diamond squares
+                else:
+                    row[i].configure(background=self.diamond_square_color)
                 entry_row.append(tk.StringVar())
-                entry_row[j].trace("w", self.test())
+                entry_row[i].trace("w", self.test())
             table.append(row)
             entry_vars.append(entry_row)
         self.entry_matrix = table
@@ -200,10 +228,9 @@ class Window:
 
     def board_update(self):
         if(not self.board == self.get_board()):
+            self.board = self.get_board()
             self.suEng.check(self.board)
-            print("Changes found.")
-        self.board = self.get_board()
-
+            #print("Changes found.")
 
 
 

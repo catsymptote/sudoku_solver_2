@@ -13,10 +13,6 @@ class Sudoku_engine:
 
 
 
-
-
-
-
     def solve(self, board):
         ## Empty 9x9x9 list: https://stackoverflow.com/questions/10668341/create-3d-array-using-python
         self.matrix = [[[0 for _ in range(9)] for _ in range(9)] for _ in range(9)]
@@ -37,26 +33,40 @@ class Sudoku_engine:
 
 
 
-    def check(self, board=None):
+    def check(self, board):
+        # Check if board is included
         if(board):
             self.board = board
         elif (not board and not self.board):
             print("No board")
             return False
-        legal = True
+
+        # Illegality check
         for x in range(9):
             for y in range(9):
                 tmp = board[x][y]
                 if(self.is_number(tmp)):
                     if(self.in_subgroup(x, y, tmp)):
-                        legal = False
+                        #print("Illegal")
+                        return False
+        #print("Legal")
 
-        if(legal):
-            print("Legal")
+        # Completion check
+        board_complete = True
+        for x in range(9):
+            for y in range(9):
+                if (self.is_number(board[x][y])):
+                    tmp = int(board[x][y])
+                    if (not (tmp > 0 and tmp <= 9)):
+                        board_complete = False
+                else:
+                    board_complete = False
+        if(board_complete):
+            print("Board complete")
         else:
-            print("Illegal")
-        printer.printer(self.board)
-        return legal
+            print("Board incomplete")
+
+        return board_complete
 
 
 
@@ -98,15 +108,15 @@ class Sudoku_engine:
                 print(sub_horizontal[i])
                 print(sub_vertical[i])
         """
-        print(num)
+        #print(num)
         if(if_includes(sub_square)):
-            print("sub_square error")
+            print("[" + str(x+1) + "," + str(y+1) + "] includes sub-square illegality.")
             return True
         if (if_includes(sub_horizontal)):
-            print("sub_horizontal error")
+            print("[" + str(x+1) + "," + str(y+1) + "] includes sub-horizontal illegality.")
             return True
         if (if_includes(sub_vertical)):
-            print("sub_vertical error")
+            print("[" + str(x+1) + "," + str(y+1) + "] includes sub-vertical illegality.")
             return True
 
         return False
@@ -121,7 +131,7 @@ class Sudoku_engine:
 
 
     def get_subgroup_square(self, x, y):
-        print(str(x) + " : " + str(y))
+        #print(str(x) + " : " + str(y))
         sqX = self.get_square_coord(x)
         sqY = self.get_square_coord(y)
         #print(str(x) + " : " + str(y))
@@ -132,7 +142,7 @@ class Sudoku_engine:
                 if(not (sqX+i == x and sqY+j == y)):
                     subgroup.append(self.board[sqX + i][sqY + j])
 
-        print(subgroup)
+        #print(subgroup)
         return subgroup
 
 

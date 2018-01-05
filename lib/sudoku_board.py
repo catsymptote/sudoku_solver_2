@@ -8,5 +8,3 @@ class Sudoku_board:
             for y in range(9):
                 for z in range(9):
                     self.matrix[x][y][z] = z
-
-
