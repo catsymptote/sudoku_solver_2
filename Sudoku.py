@@ -28,5 +28,14 @@ def update():
     win.update()
     root_window.after(100, update)
 
+# Key bindings: http://effbot.org/tkinterbook/tkinter-events-and-bindings.htm
+root_window.bind('<Up>', win.key_up)
+root_window.bind('<Down>', win.key_down)
+root_window.bind('<Left>', win.key_left)
+root_window.bind('<Right>', win.key_right)
+root_window.bind('<space>', win.key_space)
+root_window.bind('<Return>', win.key_enter)
+
+
 root_window.after(100, update)
 root_window.mainloop()

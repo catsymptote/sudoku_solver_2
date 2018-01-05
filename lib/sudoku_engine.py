@@ -63,8 +63,10 @@ class Sudoku_engine:
                     board_complete = False
         if(board_complete):
             print("Board complete")
+            pass
         else:
             print("Board incomplete")
+            pass
 
         return board_complete
 

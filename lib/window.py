@@ -9,6 +9,7 @@ import time
 
 class Window:
     board = [[]]
+    orig_board =[[]]
     entry_matrix = [[]]
     entry_IntVars = [[]]
     menu = []
@@ -47,7 +48,7 @@ class Window:
         root_window.title("Sudoku Solver")
 
         # Numbering/indexing lines
-        self.indexing.append(tk.Label(root_window, text="[y,x]", font="Arial 24"))
+        self.indexing.append(tk.Label(root_window, text="[x,y]", font="Arial 24"))
         self.indexing[0].place(x=0 * self.size, y=0 * self.size, width=self.size, height=self.size)
 
         for i in range(9):
@@ -81,15 +82,17 @@ class Window:
         self.menu.append(tk.Button(root_window, text="Solve", font="Arial 12"))
         self.menu[5].place(x=10 * self.size, y=5 * self.size, width=2 * self.size, height=self.size)
 
+        self.menu.append(tk.Button(root_window, text="Reset", font="Arial 12", command=self.reset_board))
+        self.menu[6].place(x=10 * self.size, y=6 * self.size, width=2 * self.size, height=self.size)
+
         self.menu.append(tk.Button(root_window, text="Save", font="Arial 12"))
-        self.menu[6].place(x=10 * self.size, y=7 * self.size, width=2 * self.size, height=self.size)
+        self.menu[7].place(x=10 * self.size, y=7 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Load", font="Arial 12"))
-        self.menu[7].place(x=10 * self.size, y=8 * self.size, width=2 * self.size, height=self.size)
+        self.menu[8].place(x=10 * self.size, y=8 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Settings", font="Arial 12"))
-        self.menu[8].place(x=10 * self.size, y=9 * self.size, width=2 * self.size, height=self.size)
-
+        self.menu[9].place(x=10 * self.size, y=9 * self.size, width=2 * self.size, height=self.size)
 
 
 
@@ -115,7 +118,7 @@ class Window:
                 else:
                     row[i].configure(background=self.diamond_square_color)
                 entry_row.append(tk.StringVar())
-                entry_row[i].trace("w", self.test())
+                #entry_row[i].trace("w", self.test())
             table.append(row)
             entry_vars.append(entry_row)
         self.entry_matrix = table
@@ -150,10 +153,29 @@ class Window:
         for x in range(9):
             for y in range(9):
                 self.update_cell(x, y, cell_input)
+                self.entry_matrix[x][y].config(fg=self.input_color)
 
 
 
-    def new_board(self, matrix=[], seed=-1):
+    def clean_board(self):
+        for x in range(9):
+            for y in range(9):
+                cell = self.get_cell(x, y)
+                if(cell):
+                    if(self.is_number(cell)):
+                        if(int(cell) > 0 and int(cell) <= 9):
+                            continue    # Essentially return for this for-iteration
+                self.update_cell(x, y, "")
+
+
+
+    def reset_board(self):
+        self.new_board(self.orig_board)
+
+
+
+    def new_board(self, matrix=None, seed=-1):
+        # Get board matrix from file
         if(not matrix):
             # No seed
             if(seed == -1):
@@ -166,6 +188,7 @@ class Window:
 
         self.clear_board()
 
+        # Create board
         for x in range(9):
             for y in range(9):
                 if(self.is_number(matrix[x][y])):
@@ -174,13 +197,15 @@ class Window:
                         self.update_cell(x, y, num)
                         self.entry_matrix[x][y].config(fg=self.static_color)
 
+        self.orig_board = self.get_board()
         self.reset_time()
         self.update()
 
 
 
+
     def set_fg_color(self, x, y, color):
-        self.entry_matrix[x][y].config(fg=self.color)
+        self.entry_matrix[x][y].config(fg=color)
 
 
 
@@ -229,17 +254,33 @@ class Window:
     def board_update(self):
         if(not self.board == self.get_board()):
             self.board = self.get_board()
+            self.clean_board()
             self.suEng.check(self.board)
             #print("Changes found.")
-
-
-
-    def test(self, *args):
-        #print("test")
-        pass
 
 
 
     def update(self):
         self.set_time()
         self.board_update()
+
+
+
+    # Key event functions
+    def key_up(self, event):
+        print("Key pressed: up")
+
+    def key_down(self, event):
+        print("Key pressed: down")
+
+    def key_left(self, event):
+        print("Key pressed: left")
+
+    def key_right(self, event):
+        print("Key pressed: right")
+
+    def key_space(self, event):
+        print("Key pressed: space")
+
+    def key_enter(self, event):
+        print("Key pressed: enter")
