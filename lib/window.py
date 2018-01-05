@@ -18,6 +18,9 @@ class Window:
     start = 0
 
     timeVar = ""
+    infoVar = ""
+
+    running = True
 
 
 
@@ -48,7 +51,8 @@ class Window:
         root_window.title("Sudoku Solver")
 
         # Numbering/indexing lines
-        self.indexing.append(tk.Label(root_window, text="[x,y]", font="Arial 24"))
+        self.infoVar = tk.StringVar()
+        self.indexing.append(tk.Label(root_window, textvariable=self.infoVar, font="Arial 12"))
         self.indexing[0].place(x=0 * self.size, y=0 * self.size, width=self.size, height=self.size)
 
         for i in range(9):
@@ -63,7 +67,6 @@ class Window:
 
         # Menu line
         self.timeVar = tk.StringVar()
-
         self.menu.append(tk.Label(root_window, textvariable=self.timeVar, font="Arial 24"))
         self.menu[0].place(x=10 * self.size, y=0 * self.size, width=2 * self.size, height=self.size)
 
@@ -76,7 +79,7 @@ class Window:
         self.menu.append(tk.Entry(root_window, justify="center", font="Arial 24"))
         self.menu[3].place(x=10 * self.size, y=3 * self.size, width=2 * self.size, height=self.size)
 
-        self.menu.append(tk.Button(root_window, text="Check", font="Arial 12", command=lambda: self.suEng.check(self.board)))
+        self.menu.append(tk.Button(root_window, text="Check", font="Arial 12", command=self.board_check))
         self.menu[4].place(x=10 * self.size, y=4 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Solve", font="Arial 12"))
@@ -199,6 +202,7 @@ class Window:
 
         self.orig_board = self.get_board()
         self.reset_time()
+        self.running = True
         self.update()
 
 
@@ -251,18 +255,33 @@ class Window:
 
 
 
+    def board_check(self):
+        if(not self.suEng.legality_check(self.board)):
+            print("Illegal")
+            self.infoVar.set(":(")
+        else:
+            self.infoVar.set(":)")
+
+        if(self.suEng.completaion_check(self.board)):
+            print("Board complete")
+            self.infoVar.set(":D")
+            self.running = False
+
+
+
     def board_update(self):
         if(not self.board == self.get_board()):
             self.board = self.get_board()
             self.clean_board()
-            self.suEng.check(self.board)
-            #print("Changes found.")
+            #self.suEng.legality_check(self.board)
+            self.board_check()
 
 
 
     def update(self):
-        self.set_time()
-        self.board_update()
+        if(self.running):
+            self.set_time()
+            self.board_update()
 
 
 

@@ -33,42 +33,26 @@ class Sudoku_engine:
 
 
 
-    def check(self, board):
-        # Check if board is included
-        if(board):
-            self.board = board
-        elif (not board and not self.board):
-            print("No board")
-            return False
-
-        # Illegality check
+    def legality_check(self, board):
+        self.board = board
         for x in range(9):
             for y in range(9):
                 tmp = board[x][y]
                 if(self.is_number(tmp)):
                     if(self.in_subgroup(x, y, tmp)):
-                        #print("Illegal")
                         return False
-        #print("Legal")
+        return True
 
-        # Completion check
-        board_complete = True
+    def completaion_check(self, board):
+        self.board = board
         for x in range(9):
             for y in range(9):
                 if (self.is_number(board[x][y])):
                     tmp = int(board[x][y])
-                    if (not (tmp > 0 and tmp <= 9)):
-                        board_complete = False
-                else:
-                    board_complete = False
-        if(board_complete):
-            print("Board complete")
-            pass
-        else:
-            print("Board incomplete")
-            pass
-
-        return board_complete
+                    if (tmp > 0 and tmp <= 9):
+                        continue
+                return False
+        return True
 
 
 
