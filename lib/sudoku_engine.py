@@ -14,22 +14,123 @@ class Sudoku_engine:
 
 
     def solve(self, board):
-        ## Empty 9x9x9 list: https://stackoverflow.com/questions/10668341/create-3d-array-using-python
-        self.matrix = [[[0 for _ in range(9)] for _ in range(9)] for _ in range(9)]
-        # Loop
+        self.generate_possibility_space_matrix(board)
+        uncomplete = True
+        while(uncomplete):
+            ##  Check if list lengths are 1 for all cells (i.e. board is completed).
+            if(self.matrix_completion_check()):
+                self.board = self.matrix_to_board()
+                uncomplete = False
+                continue
+
+            #printer.printer(self.matrix_length_board())
+            ##  Iterate the eliminator algorithm (Method 1).
+            if(not self.eliminator()):
+                ##  Method 2
+                pass
+            #print("test  .")
+
+        print("Board complete?")
+        if(self.completaion_check(board)):
+            print("Board complete!")
+        else:
+            print("Dafuq just happened!? o_O")
+
+        return self.board
+
+
+
+    def eliminator(self):
+        ##  Repeating loop while changes happen.
+        change_occured = True
+        iterations = 0
+        checks = 0  # Unnecessary, but fun.
+        total_length = 0
+        while(change_occured):  ##  Why u no dowhile, Python!?
+            change_occured = False
+            ##  Loop through matrix.
+            for x in range(9):
+                for y in range(9):
+                    ##  Loop through possibility lists.
+                    z = 0
+                    total_length +=len(self.matrix[x][y])
+                    while(z < len(self.matrix[x][y])):
+                        #for z in range(len(self.matrix[x][y])):
+                        ##  If element exists in subgroup (and is therefore not a possibility).
+                        #print(self.matrix[x][y][z])
+                        if(self.in_subgroup(x, y, self.matrix[x][y][z])):
+                            ##  Remove element from subgroup.
+                            del self.matrix[x][y][z]
+                            change_occured = True
+                            #self.matrix[x][y].pop(z)
+                            #print("Change occured")
+                        else:
+                            z += 1
+                            #print("No change")
+                        checks += 1
+            iterations += 1
+            #print("test  -")
+            #print("Iteration: " + str(iterations))
+        #print("Total length: " + str(total_length))
+        #print("Total iterations: " + str(iterations) + "\t- Total checks: " + str(checks))
+        return change_occured
+
+
+
+    def matrix_to_board(self):
+        board = [[0 for _ in range(9)] for _ in range(9)]
         for x in range(9):
             for y in range(9):
-                # Board cell has no value.
-                if (board[x][y] == 0):
-                    # Fill with 1-9
-                    for z in range(9):
-                        self.matrix[x][y][z] = z
-                # Board cell has a (none zero) value.
+                board[x][y] = self.matrix[x][y][0]
+        return board
+
+
+
+    def matrix_length_board(self):
+        board = [[0 for _ in range(9)] for _ in range(9)]
+        for x in range(9):
+            for y in range(9):
+                board[x][y] = len(self.matrix[x][y])
+        return board
+
+
+
+    def matrix_completion_check(self):
+        total_list_lengths = 0
+        ones = 0
+        for x in range(9):
+            for y in range(9):
+                total_list_lengths += len(self.matrix[x][y])
+                if(not len(self.matrix[x][y]) == 1):
+                    #print("Still not complete")
+                    return False
+                elif(not len(self.matrix[x][y]) >= 1):
+                    print("Empty list")
                 else:
-                    self.matrix[x][y][:1]
-                    self.matrix[x][y][0] = board[x][y]
-                    # del self.matrix[x][y][:]
-                    # self.matrix[x][y].append(board[x][y])
+                    ones += 1
+        #print(ones)
+        print("List lengths: " + str(total_list_lengths))
+        return True
+
+
+    def generate_possibility_space_matrix(self, board):
+        # Create the matrix possibility space
+        ## Empty 9x9x9 list: https://stackoverflow.com/questions/10668341/create-3d-array-using-python
+        self.matrix = [[[] for _ in range(9)] for _ in range(9)]
+        #print(self.matrix)
+        for x in range(9):
+            for y in range(9):
+                cell = board[x][y]
+                # If cell has value
+                if (self.is_number(cell)):
+                    cell = int(cell)
+                    # If cell is acceptable number
+                    if (cell > 0 and cell <= 9):
+                        self.matrix[x][y] = [cell]
+                        continue
+                for z in range(9):
+                    self.matrix[x][y].append(z)
+        #print(self.matrix)
 
 
 
@@ -42,6 +143,8 @@ class Sudoku_engine:
                     if(self.in_subgroup(x, y, tmp)):
                         return False
         return True
+
+
 
     def completaion_check(self, board):
         self.board = board
@@ -96,13 +199,13 @@ class Sudoku_engine:
         """
         #print(num)
         if(if_includes(sub_square)):
-            print("[" + str(x+1) + "," + str(y+1) + "] includes sub-square illegality.")
+            #print("Illegal: Cell [" + str(x+1) + "," + str(y+1) + "] includes sub-square illegality.")
             return True
         if (if_includes(sub_horizontal)):
-            print("[" + str(x+1) + "," + str(y+1) + "] includes sub-horizontal illegality.")
+            #print("Illegal: Cell [" + str(x+1) + "," + str(y+1) + "] includes sub-horizontal illegality.")
             return True
         if (if_includes(sub_vertical)):
-            print("[" + str(x+1) + "," + str(y+1) + "] includes sub-vertical illegality.")
+            #print("Illegal: Cell [" + str(x+1) + "," + str(y+1) + "] includes sub-vertical illegality.")
             return True
 
         return False
@@ -160,6 +263,7 @@ class Sudoku_engine:
             if(not j == y):
                 subgroup.append(self.board[x][j])
         return subgroup
+
 
 
     def is_number(self, s):

@@ -1,5 +1,6 @@
 from lib import file_interface as fInter
 from lib import sudoku_engine as engine
+from lib import printer
 
 
 import tkinter as tk
@@ -82,7 +83,7 @@ class Window:
         self.menu.append(tk.Button(root_window, text="Check", font="Arial 12", command=self.board_check))
         self.menu[4].place(x=10 * self.size, y=4 * self.size, width=2 * self.size, height=self.size)
 
-        self.menu.append(tk.Button(root_window, text="Solve", font="Arial 12"))
+        self.menu.append(tk.Button(root_window, text="Solve", font="Arial 12", command=self.board_solve))
         self.menu[5].place(x=10 * self.size, y=5 * self.size, width=2 * self.size, height=self.size)
 
         self.menu.append(tk.Button(root_window, text="Reset", font="Arial 12", command=self.reset_board))
@@ -178,33 +179,73 @@ class Window:
 
 
     def new_board(self, matrix=None, seed=-1):
-        # Get board matrix from file
-        if(not matrix):
-            # No seed
-            if(seed == -1):
+        if (not matrix):
+            if (seed == -1):
                 matrix = self.tabFile.get_table()
-            elif(not self.is_number(seed)):
+            elif (not self.is_number(seed)):
                 print("Seed is not a number.")
                 matrix = self.tabFile.get_table()
             else:
                 matrix = self.tabFile.get_table(seed)
+            """
+            ##  Just no -_-
+            ##  Simulated do while
+            runs = 0
+            not_done = True
+            #while(not_done):
+            while(runs < 5):
+                print("run")
+                if(seed == -1):
+                    matrix = self.tabFile.get_table()
+                elif(not self.is_number(seed)):
+                    print("Seed is not a number.")
+                    matrix = self.tabFile.get_table()
+                else:
+                    matrix = self.tabFile.get_table(seed)
+
+                if (self.acceptable_board_size(matrix)):
+                    continue
+
+                runs += 1
+                #if(not self.acceptable_board_size(matrix)):
+                    #runs += 1
+                    #not_done = False
+            """
 
         self.clear_board()
-
-        # Create board
-        for x in range(9):
-            for y in range(9):
-                if(self.is_number(matrix[x][y])):
-                    num = int(matrix[x][y])
-                    if(not num == 0):
-                        self.update_cell(x, y, num)
-                        self.entry_matrix[x][y].config(fg=self.static_color)
+        try:
+            # Create board
+            for x in range(9):
+                for y in range(9):
+                    if(self.is_number(matrix[x][y])):
+                        num = int(matrix[x][y])
+                        if(not num == 0):
+                            self.update_cell(x, y, num)
+                            self.entry_matrix[x][y].config(fg=self.static_color)
+        except (IndexError):
+            ##  tabFile.get_table() probably returns a non-functional matrix.
+            print("window.new_board() Index Error! Probably ignorable :P")
+            return False
 
         self.orig_board = self.get_board()
         self.reset_time()
         self.running = True
         self.update()
+        return True
 
+
+
+    def acceptable_board_size(self, board):
+        if(not len(board) == 9):
+            return False
+
+        for x in range(9):
+            if (not len(board[x]) == 9):
+                return False
+
+        #printer.printer(board)
+        #print("---")
+        return True
 
 
 
@@ -257,7 +298,7 @@ class Window:
 
     def board_check(self):
         if(not self.suEng.legality_check(self.board)):
-            print("Illegal")
+            #print("Illegal")
             self.infoVar.set(":(")
         else:
             self.infoVar.set(":)")
@@ -266,6 +307,18 @@ class Window:
             print("Board complete")
             self.infoVar.set(":D")
             self.running = False
+
+
+
+    def board_solve(self):
+        if(self.suEng.legality_check(self.board)):
+            printer.printer(self.board)
+            solved_board = self.suEng.solve(self.board)
+            print("Solved board:")
+            printer.printer(solved_board)
+            for x in range(9):
+                for y in range(9):
+                    self.update_cell(x, y, solved_board[x][y])
 
 
 
