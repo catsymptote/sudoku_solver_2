@@ -9,6 +9,7 @@ import time
 
 
 class Window:
+    master = None
     board = [[]]
     orig_board =[[]]
     static_cells = []
@@ -44,6 +45,8 @@ class Window:
 
 
     def __init__(self, root_window):
+        self.master =root_window
+
         w = (9 + 2 + 1) * self.size
         h = (9 + 1) * self.size
         shiftX = 200
@@ -125,6 +128,10 @@ class Window:
                 # Part of diamond squares
                 else:
                     row[i].configure(background=self.diamond_square_color)
+
+                #name = str(i) + "," + str(j)
+                #row[i].configure(name=name)
+                #print(row[i].winfo_id())
                 entry_row.append(tk.StringVar())
                 #entry_row[i].trace("w", self.test())
             table.append(row)
@@ -393,8 +400,11 @@ class Window:
                     ##  Make value in new cell by removing the previous number.
                     new_cell = tmp_board[diff[0]][diff[1]].replace(self.board[diff[0]][diff[1]], "")
 
-                    ##  Update cell (new_cell[], in case more than 2 numbers were put in).
-                    self.update_cell(diff[0], diff[1], new_cell[len(new_cell) -1])
+                    ##  Update cell (new_cell[], in case more than 2 numbers were put in). Exception is because stupid or something. -_-
+                    try:
+                        self.update_cell(diff[0], diff[1], new_cell[len(new_cell) -1])
+                    except (IndexError):
+                        self.update_cell(diff[0], diff[1], "")
 
             else:
                 self.set_board(self.board)
@@ -406,9 +416,10 @@ class Window:
 
 
     def arrow_key_update(self, coord, plus):
-        ##  if(self.focus_entry_on_board()):
-            ##  self.cell_position = focus_cell
+        ##  If focus is on a cell, set cell_position to that cell.
+        self.focus_entry_on_board()
 
+        ##  Increment or decrement in x or y based on arrow key input.
         if(plus):
             self.cell_position[coord] += 1
         else:
@@ -419,12 +430,22 @@ class Window:
 
 
     def focus_entry_on_board(self):
+        ##  Focused << object that is focused on. Then chech if it exists, just in case? :P
+        focused = self.master.focus_get()
+        if(not focused):
+            return
+
         for x in range(9):
             for y in range(9):
-                if("""focus on board"""):
-                    return True
+                ##  If is of focused match id of cell at x,y.
+                if(focused.winfo_id() == self.entry_matrix[x][y].winfo_id()):
+                    self.cell_position = [x, y]
 
-        return False
+
+
+    def get_focus(self):
+        #print(row[i].winfo_id())
+        pass
 
 
 
