@@ -11,6 +11,7 @@ import time
 class Window:
     board = [[]]
     orig_board =[[]]
+    static_cells = []
     entry_matrix = [[]]
     entry_IntVars = [[]]
     menu = []
@@ -22,6 +23,8 @@ class Window:
     infoVar = ""
 
     running = True
+
+    cell_position = [0, 0]
 
 
 
@@ -109,6 +112,7 @@ class Window:
                 row.append(tk.Entry(root_window, justify="center", font="Arial 32 bold"))
                 row[i].place(x=(i+1)*self.size, y=(j+1)*self.size, width=self.size, height=self.size)
                 #row[j].grid(row=5*i, column=j, rowspan=5, columnspan=1)
+                ##  Colours for sub-squares.
                 # Part of x squares
                 if(
                         (i < 3 and i >= 0 and j < 3 and j >= 0) or
@@ -132,7 +136,7 @@ class Window:
 
 
     def update_cell(self, x, y, ins):
-        self.entry_matrix[x][y].delete(0)
+        self.entry_matrix[x][y].delete(0, 'end')
         self.entry_matrix[x][y].insert(0, str(ins))
 
 
@@ -153,6 +157,13 @@ class Window:
 
 
 
+    def set_board(self, board=None):
+        for x in range(9):
+            for y in range(9):
+                self.update_cell(x, y, board[x][y])
+
+
+
     def clear_board(self, cell_input = ""):
         for x in range(9):
             for y in range(9):
@@ -167,9 +178,13 @@ class Window:
                 cell = self.get_cell(x, y)
                 if(cell):
                     if(self.is_number(cell)):
-                        if(int(cell) > 0 and int(cell) <= 9):
+                        if(int(cell) > 0):
+                            ##  if two numbers has been filled in.
+                            if(int(cell) > 9):
+                                return False
                             continue    # Essentially return for this for-iteration
                 self.update_cell(x, y, "")
+        return True
 
 
 
@@ -187,6 +202,7 @@ class Window:
                 matrix = self.tabFile.get_table()
             else:
                 matrix = self.tabFile.get_table(seed)
+
             """
             ##  Just no -_-
             ##  Simulated do while
@@ -228,10 +244,42 @@ class Window:
             return False
 
         self.orig_board = self.get_board()
+        self.board = self.orig_board
+        self.set_static_cells()
         self.reset_time()
         self.running = True
         self.update()
         return True
+
+
+
+    def set_static_cells(self):
+        #self.static_cells.clear()
+        #del self.static_cells[:]
+        self.static_cells = []
+        for x in range(9):
+            for y in range(9):
+                cell = self.board[x][y]
+                if(self.is_number(cell)):
+                    cell = int(cell)
+                    if(cell >= 1 and cell <= 9):
+                        self.static_cells.append([x, y])
+
+
+
+    def check_if_static(self, diff):
+        if(diff in self.static_cells):
+            return True
+        return False
+
+
+
+    def get_board_diff(self, board1, board2):
+        for x in range(9):
+            for y in range(9):
+                if(not board1[x][y] == board2[x][y]):
+                    return [x, y]
+        return False
 
 
 
@@ -323,11 +371,60 @@ class Window:
 
 
     def board_update(self):
+        ##  If change occured.
         if(not self.board == self.get_board()):
-            self.board = self.get_board()
-            self.clean_board()
+            ##  Create tmp board and backup board.
+            tmp_board = self.get_board()
+            backup_board = self.board
+
+            ##  Get the changed cell.
+            diff = self.get_board_diff(tmp_board, self.board)
+
+            ##  If changed cell is not static cell.
+            if(not self.check_if_static(diff)):
+                self.board = tmp_board
+
+                ##  If cell > 9 (i.e. two input numbers".
+                if(not self.clean_board()):
+                    ##  Reset self.board to backup_board and set as actual board.
+                    self.board = backup_board
+                    self.set_board(self.board)
+
+                    ##  Make value in new cell by removing the previous number.
+                    new_cell = tmp_board[diff[0]][diff[1]].replace(self.board[diff[0]][diff[1]], "")
+
+                    ##  Update cell (new_cell[0], in case more than 2 numbers were put in).
+                    self.update_cell(diff[0], diff[1], new_cell[0])
+
+            else:
+                self.set_board(self.board)
+
             #self.suEng.legality_check(self.board)
+            self.clean_board()
             self.board_check()
+
+
+
+    def arrow_key_update(self, coord, plus):
+        ##  if(self.focus_entry_on_board()):
+            ##  self.cell_position = focus_cell
+
+        if(plus):
+            self.cell_position[coord] += 1
+        else:
+            self.cell_position[coord] -= 1
+
+        self.entry_matrix[self.cell_position[0]][self.cell_position[1]].focus()
+
+
+
+    def focus_entry_on_board(self):
+        for x in range(9):
+            for y in range(9):
+                if("""focus on board"""):
+                    return True
+
+        return False
 
 
 
@@ -340,16 +437,24 @@ class Window:
 
     # Key event functions
     def key_up(self, event):
-        print("Key pressed: up")
+        #print("Key pressed: up")
+        #self.cell_position[0] += 1
+        self.arrow_key_update(0, False)
 
     def key_down(self, event):
-        print("Key pressed: down")
+        #print("Key pressed: down")
+        #self.cell_position[0] -= 1
+        self.arrow_key_update(0, True)
 
     def key_left(self, event):
-        print("Key pressed: left")
+        #print("Key pressed: left")
+        #self.cell_position[1] += 1
+        self.arrow_key_update(1, False)
 
     def key_right(self, event):
-        print("Key pressed: right")
+        #print("Key pressed: right")
+        #self.cell_position[1] -= 1
+        self.arrow_key_update(1, True)
 
     def key_space(self, event):
         print("Key pressed: space")
