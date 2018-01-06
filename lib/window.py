@@ -393,8 +393,8 @@ class Window:
                     ##  Make value in new cell by removing the previous number.
                     new_cell = tmp_board[diff[0]][diff[1]].replace(self.board[diff[0]][diff[1]], "")
 
-                    ##  Update cell (new_cell[0], in case more than 2 numbers were put in).
-                    self.update_cell(diff[0], diff[1], new_cell[0])
+                    ##  Update cell (new_cell[], in case more than 2 numbers were put in).
+                    self.update_cell(diff[0], diff[1], new_cell[len(new_cell) -1])
 
             else:
                 self.set_board(self.board)
