@@ -176,7 +176,7 @@ class Sudoku_engine:
         #sub_horizontal= self.purge_empty(sub_horizontal)
         #sub_vertical= self.purge_empty(sub_vertical)
 
-        if(not (len(sub_square) == 9 and len(sub_horizontal) == 9 and len(sub_vertical) == 9)):
+        if(not (len(sub_square) == 9-1 and len(sub_horizontal) == 9-1 and len(sub_vertical) == 9-1)):
             #print("Error in subgroup sized!")
             #return False
             pass

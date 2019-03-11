@@ -28,8 +28,6 @@ class Window:
     cell_position = [0, 0]
 
 
-
-
     # Color settings
     static_color    = "#40E0D0"
     input_color     = "#000000"
