@@ -3,11 +3,11 @@ import random
 
 
 class Table_file:
-    fname = "tables\\sudoku_tables.txt"
+    fname = "tables/sudoku_tables.txt"
     tables = []
 
 
-    def __init__(self, fname = "tables\\sudoku_tables.txt"):
+    def __init__(self, fname = "tables/sudoku_tables.txt"):
         self.fname = fname
         table = [[]]
         with open(self.fname) as f:
