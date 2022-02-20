@@ -1,5 +1,6 @@
 import sys
 
+
 def printer(table):
     for j in range(len(table)):
         for i in range(len(table[j])):

@@ -1,6 +1,6 @@
-from lib import file_interface as fInter
-from lib import printer
-from lib import window
+from src import file_interface as fInter
+from src import printer
+from src import window
 
 
 
